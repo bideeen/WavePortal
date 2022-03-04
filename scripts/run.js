@@ -1,4 +1,10 @@
 const main = async () => {
+    const [owner, randomPerson] = await hre.ethers.getSigners();
+    // In order to deploy something to the blockchain,
+    //  we need to have a wallet address! Hardhat does this for us
+    //  magically in the background, but here I grabbed the wallet address
+    //  of contract owner and I also grabbed a random wallet address and 
+    // called it randomPerson. This will make more sense in a moment.
     const waveContractFactory = await hre.ethers.getContractFactory("WavePortal");
     // This will actually compile our contract and generate the necessary
     //  files we need to work with our contract under the artifacts 
@@ -23,6 +29,26 @@ const main = async () => {
     // So, this address gives us easy access to the contract we're 
     // interested in working with! This will be more important a bit later
     //  once we deploy to a real Ethereum network.
+    console.log("Contract deployed by:", owner.address);
+    // I'm doing this just to see the address of the person 
+    // deploying our contract. I'm curious!
+    
+    let waveCount;
+    waveCount = await waveContract.getTotalWaves();
+
+    let waveTxn = await waveContract.wave()
+    await waveTxn.wait()
+
+    waveCount = await waveContract.getTotalWaves()
+    // Basically, we need to manually call our functions! 
+    // Just like we would any normal API. 
+    // First I call the function to grab the # of total waves. 
+    // Then, I do the wave. 
+    // Finally, I grab the waveCount one more time to see if it changed.
+    waveTxn = await waveContract.connect(randomPerson).wave();
+    await waveTxn.wait()
+
+    waveCount = await waveContract.getTotalWaves();
 };
 
 const runMain = async () => {
